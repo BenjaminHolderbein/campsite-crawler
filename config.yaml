@@ -1,0 +1,15 @@
+poll_interval_seconds: 60
+
+campgrounds:
+  - name: "Yosemite Valley Campground"
+    facility_id: "232447"
+  - name: "Pfeiffer Big Sur"
+    facility_id: "233116"
+
+date_range:
+  # These are CHECK-IN dates, not check-out dates.
+  # Each date represents a night you want to stay.
+  # Example: to find a site available Sat + Sun night (checking out Mon),
+  # set start to Saturday and end to Sunday.
+  start: "2026-03-14"
+  end: "2026-03-16"
