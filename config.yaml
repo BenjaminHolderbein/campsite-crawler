@@ -1,15 +1,44 @@
 poll_interval_seconds: 60
 
-campgrounds:
+# Recreation.gov campgrounds
+# facility_id: the number in the URL — recreation.gov/camping/campgrounds/{facility_id}
+recreation_gov:
   - name: "Yosemite Valley Campground"
     facility_id: "232447"
   - name: "Pfeiffer Big Sur"
     facility_id: "233116"
 
+# ReserveCalifornia state parks (use recreation_area_id from reservecalifornia.com)
+# Find IDs with: uv run camply campgrounds --provider ReserveCalifornia --search "Park Name"
+reservecalifornia:
+  - name: "Pfeiffer Big Sur SP"
+    recreation_area_id: 690
+  - name: "Salt Point SP"
+    recreation_area_id: 703
+  - name: "Henry Cowell Redwoods SP"
+    recreation_area_id: 655
+  - name: "Big Basin Redwoods SP"
+    recreation_area_id: 3
+  - name: "Portola Redwoods SP"
+    recreation_area_id: 695
+  - name: "Butano SP"
+    recreation_area_id: 622
+  - name: "Half Moon Bay SB"
+    recreation_area_id: 652
+  - name: "Manresa SB"
+    recreation_area_id: 672
+  - name: "Mount Diablo SP"
+    recreation_area_id: 683
+  - name: "Sonoma Coast SP"
+    recreation_area_id: 718
+  - name: "Andrew Molera SP"
+    recreation_area_id: 1077
+  - name: "Julia Pfeiffer Burns SP"
+    recreation_area_id: 661
+
 date_range:
-  # These are CHECK-IN dates, not check-out dates.
-  # Each date represents a night you want to stay.
-  # Example: to find a site available Sat + Sun night (checking out Mon),
-  # set start to Saturday and end to Sunday.
+  # start: your check-in date. end: your check-out date minus 1 day (last night of stay).
+  # Example: check in Sat, check out Mon → start: Saturday, end: Sunday.
+  # The number of nights is computed automatically as (end - start).days + 1.
   start: "2026-03-14"
   end: "2026-03-16"
