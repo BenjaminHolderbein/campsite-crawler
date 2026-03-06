@@ -1,10 +1,10 @@
 # Campsite Crawler
 
-Polls recreation.gov for campsite availability and sends a push notification the moment a site opens up.
+Polls recreation.gov and ReserveCalifornia state parks for campsite availability and sends a push notification the moment a site opens up.
 
 ## How it works
 
-The recreation.gov website uses a public JSON API for its own frontend — no scraping, no auth token required. This tool calls that same API on a configurable interval, compares results against the last known state, and fires a notification only when something new becomes available.
+Both providers expose JSON APIs used by their own frontends — no scraping, no auth token required. This tool calls those APIs on a configurable interval, compares results against the last known state, and fires a notification only when something new becomes available.
 
 ## Setup
 
@@ -19,25 +19,36 @@ Edit `config.yaml`:
 ```yaml
 poll_interval_seconds: 60
 
-campgrounds:
+# Recreation.gov campgrounds
+recreation_gov:
   - name: "Yosemite Valley Campground"
     facility_id: "232447"
 
+# ReserveCalifornia state parks
+reservecalifornia:
+  - name: "Pfeiffer Big Sur SP"
+    recreation_area_id: 690
+
 date_range:
-  # These are check-in dates (nights you want to stay), not check-out dates.
+  # start: your check-in date. end: your check-out date minus 1 day (last night of stay).
+  # Example: check in Sat, check out Mon → start: Saturday, end: Sunday.
   start: "2026-06-14"
   end: "2026-06-15"
 ```
 
-To find a facility ID, go to the campground page on recreation.gov — the number in the URL is the ID:
+**Recreation.gov:** find the `facility_id` in the URL of the campground page:
 ```
 https://www.recreation.gov/camping/campgrounds/232447
-                                                 ^^^^^^
+                                               ^^^^^^
 ```
-
 Or use the search helper:
 ```bash
 uv run python -m src.search "Yosemite Valley"
+```
+
+**ReserveCalifornia:** find the `recreation_area_id` using camply:
+```bash
+uv run camply campgrounds --provider ReserveCalifornia --search "Park Name"
 ```
 
 **3. Set up push notifications (optional)**
