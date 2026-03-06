@@ -1,8 +1,8 @@
-"""Tests for api.py helper functions (no network calls)."""
+"""Tests for recreationgov.py helper functions (no network calls)."""
 
 from datetime import date
 
-from src.api import _parse_date, filter_by_dates
+from src.recreationgov import _parse_date, filter_by_dates
 
 
 def test_parse_date_valid():

@@ -2,35 +2,23 @@ poll_interval_seconds: 60
 
 # Recreation.gov campgrounds
 # facility_id: the number in the URL — recreation.gov/camping/campgrounds/{facility_id}
-recreation_gov:
-  - name: "Yosemite Valley Campground"
-    facility_id: "232447"
-  - name: "Pfeiffer Big Sur"
-    facility_id: "233116"
+recreation_gov: []
 
 # ReserveCalifornia state parks (use recreation_area_id from reservecalifornia.com)
 # Find IDs with: uv run camply campgrounds --provider ReserveCalifornia --search "Park Name"
 reservecalifornia:
-  - name: "Pfeiffer Big Sur SP"
-    recreation_area_id: 690
+  # North of SF
+  - name: "Sonoma Coast SP"
+    recreation_area_id: 718
   - name: "Salt Point SP"
     recreation_area_id: 703
-  - name: "Henry Cowell Redwoods SP"
-    recreation_area_id: 655
-  - name: "Big Basin Redwoods SP"
-    recreation_area_id: 3
-  - name: "Portola Redwoods SP"
-    recreation_area_id: 695
-  - name: "Butano SP"
-    recreation_area_id: 622
+  # South of SF
   - name: "Half Moon Bay SB"
     recreation_area_id: 652
   - name: "Manresa SB"
     recreation_area_id: 672
-  - name: "Mount Diablo SP"
-    recreation_area_id: 683
-  - name: "Sonoma Coast SP"
-    recreation_area_id: 718
+  - name: "Pfeiffer Big Sur SP"
+    recreation_area_id: 690
   - name: "Andrew Molera SP"
     recreation_area_id: 1077
   - name: "Julia Pfeiffer Burns SP"

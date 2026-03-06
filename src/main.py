@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from . import api, checker, notifier, state
+from . import recreationgov as api, checker, notifier, state
 from . import reservecalifornia as rc
 
 load_dotenv()

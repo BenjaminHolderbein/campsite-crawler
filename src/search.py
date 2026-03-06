@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import sys
 
-from . import api
+from . import recreationgov as api
 
 
 def main() -> None:
