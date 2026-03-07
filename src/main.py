@@ -47,6 +47,7 @@ def _poll_recreation_gov(config: dict, current_state: dict, start: date, end: da
         name = cg["name"]
         fid = cg["facility_id"]
         print(f"[rec.gov] Checking {name}...", flush=True)
+        t0 = time.monotonic()
         try:
             fresh: dict[str, dict[str, str]] = {}
             for month in months:
@@ -57,23 +58,25 @@ def _poll_recreation_gov(config: dict, current_state: dict, start: date, end: da
                         fresh[site_id] = {}
                     fresh[site_id].update(dates)
 
+            elapsed = f"{time.monotonic() - t0:.0f}s"
             stored = state.get_campground_state(current_state, fid)
             events = checker.find_new_openings(name, fid, fresh, stored, min_nights=min_nights)
 
             if events:
-                print(f"  Found {len(events)} new opening(s)!")
+                print(f"  Found {len(events)} new opening(s)! ({elapsed})")
                 notifier.notify(events)
                 total += len(events)
             else:
                 available_count = sum(
                     1 for dates in fresh.values() for s in dates.values() if s == "A"
                 )
-                print(f"  No new openings. ({available_count} currently available)")
+                print(f"  No new openings. ({available_count} currently available) ({elapsed})")
 
             state.update_campground_state(current_state, fid, fresh)
 
         except Exception as exc:
-            print(f"  Error: {exc}", file=sys.stderr)
+            elapsed = f"{time.monotonic() - t0:.0f}s"
+            print(f"  Error: {exc} ({elapsed})", file=sys.stderr)
     return total
 
 
@@ -85,8 +88,10 @@ def _poll_reserve_california(config: dict, current_state: dict, start: date, end
         area_id = int(cg["recreation_area_id"])
         state_key = f"rc:{area_id}"
         print(f"[ReserveCalifornia] Checking {name}...", flush=True)
+        t0 = time.monotonic()
         try:
             available = rc.get_available_campsites(area_id, start, end, nights=nights)
+            elapsed = f"{time.monotonic() - t0:.0f}s"
             if available is None:
                 print(f"  Skipped (max stay shorter than {nights} nights)")
                 continue
@@ -108,16 +113,21 @@ def _poll_reserve_california(config: dict, current_state: dict, start: date, end
                 e.booking_url = url_map.get(e.site_id, "")
 
             if new_events:
-                print(f"  Found {len(new_events)} new opening(s)!")
+                print(f"  Found {len(new_events)} new opening(s)! ({elapsed})")
                 notifier.notify(new_events)
                 total += len(new_events)
             else:
-                print(f"  No new openings. ({len(available)} currently available)")
+                print(f"  No new openings. ({len(available)} currently available) ({elapsed})")
 
             state.update_campground_state(current_state, state_key, fresh)
 
+        except SystemExit:
+            # camply calls sys.exit() when no campsites are found — treat as empty results
+            elapsed = f"{time.monotonic() - t0:.0f}s"
+            print(f"  No new openings. (0 currently available) ({elapsed})")
         except Exception as exc:
-            print(f"  Error: {exc}", file=sys.stderr)
+            elapsed = f"{time.monotonic() - t0:.0f}s"
+            print(f"  Error: {exc} ({elapsed})", file=sys.stderr)
     return total
 
 

@@ -2,7 +2,12 @@ poll_interval_seconds: 60
 
 # Recreation.gov campgrounds
 # facility_id: the number in the URL — recreation.gov/camping/campgrounds/{facility_id}
-recreation_gov: []
+recreation_gov:
+  # South of SF — Big Sur
+  - name: "Kirk Creek"
+    facility_id: "234052"
+  - name: "Plaskett Creek"
+    facility_id: "233358"
 
 # ReserveCalifornia state parks (use recreation_area_id from reservecalifornia.com)
 # Find IDs with: uv run camply campgrounds --provider ReserveCalifornia --search "Park Name"
@@ -12,6 +17,10 @@ reservecalifornia:
     recreation_area_id: 718
   - name: "Salt Point SP"
     recreation_area_id: 703
+  - name: "Manchester SP"
+    recreation_area_id: 671
+  - name: "MacKerricher SP"
+    recreation_area_id: 670
   # South of SF
   - name: "Half Moon Bay SB"
     recreation_area_id: 652

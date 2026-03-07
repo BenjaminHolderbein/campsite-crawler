@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from datetime import date, timedelta
 
 from camply.containers import SearchWindow
 from camply.search import SearchReserveCalifornia
@@ -12,6 +13,23 @@ from .checker import AvailabilityEvent
 
 # Suppress camply's verbose logging
 logging.getLogger("camply").setLevel(logging.ERROR)
+
+# Wall-clock timeout for the entire camply call (init + HTTP requests).
+# camply can hang indefinitely on slow/stalled ReserveCalifornia API responses.
+_CAMPLY_WALL_TIMEOUT = 60  # seconds
+
+
+def _run_camply(recreation_area_id: int, start: date, end: date, nights: int):
+    """Run inside a thread so we can enforce a wall-clock timeout."""
+    window = SearchWindow(start_date=start, end_date=end + timedelta(days=1))
+    searcher = SearchReserveCalifornia(
+        search_window=window,
+        recreation_area=[recreation_area_id],
+        nights=nights,
+    )
+    if searcher.nights < nights:
+        return None
+    return searcher.get_matching_campsites()
 
 
 def get_available_campsites(
@@ -28,16 +46,19 @@ def get_available_campsites(
 
     nights: minimum consecutive nights required (default 1 = any single night).
     """
-    # camply's end_date is exclusive, so add 1 day to include the last check-in night
-    window = SearchWindow(start_date=start, end_date=end + timedelta(days=1))
-    searcher = SearchReserveCalifornia(
-        search_window=window,
-        recreation_area=[recreation_area_id],
-        nights=nights,
-    )
-    if searcher.nights < nights:
+    pool = ThreadPoolExecutor(max_workers=1)
+    future = pool.submit(_run_camply, recreation_area_id, start, end, nights)
+    try:
+        campsites = future.result(timeout=_CAMPLY_WALL_TIMEOUT)
+    except FuturesTimeoutError:
+        pool.shutdown(wait=False)
+        raise TimeoutError(
+            f"ReserveCalifornia check timed out after {_CAMPLY_WALL_TIMEOUT}s"
+        )
+    pool.shutdown(wait=False)
+
+    if campsites is None:
         return None
-    campsites = searcher.get_matching_campsites()
 
     events: list[AvailabilityEvent] = []
     for site in campsites:
